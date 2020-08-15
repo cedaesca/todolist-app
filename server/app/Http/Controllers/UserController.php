@@ -47,9 +47,9 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function show()
+    public function show(Request $request)
     {
-        return response()->json(Auth::user());
+        return response()->json($request->user());
     }
 
     /**
@@ -59,9 +59,23 @@ class UserController extends Controller
      * @param  \App\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, User $user)
+    public function update(Request $request)
     {
-        //
+        $this->validate($request, [
+            'name' => 'string',
+            'password' => 'string|min:6'
+        ]);
+
+        $user = $request->user();
+        $user->name = $request->name ?? $user->name;
+
+        if (!is_null($request->password)) {
+            $user->password = Hash::make($request->password);
+        }
+
+        $user->save();
+
+        return response()->json($user);
     }
 
     /**
