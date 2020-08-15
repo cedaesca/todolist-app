@@ -181,4 +181,32 @@ class UsersTest extends TestCase
 
         $this->assertTrue(Hash::check($newData['password'], $user->password));
     }
+
+    /** @test */
+    public function user_can_delete_his_account()
+    {
+        factory(\App\User::class, 10)->create();
+        $user = factory(\App\User::class)->create();
+
+        $response = $this->actingAs($user)->delete('/users', [
+            'confirmation' => $user->email
+        ]);
+
+        $response->assertResponseStatus(200);
+        $response->seeJsonEquals($user->toArray());
+
+        $this->notSeeInDatabase('users', ['email' => $user->email]);
+    }
+
+    /** @test */
+    public function user_cannot_delete_his_account_without_valid_confirmation()
+    {
+        $user = factory(\App\User::class)->create();
+
+        $this->actingAs($user)->delete('/users')->assertResponseStatus(422);
+
+        $this->actingAs($user)->delete('/users', [
+            'confirmation' => 'someRandomStuff'
+        ])->assertResponseStatus(422);
+    }
 }
