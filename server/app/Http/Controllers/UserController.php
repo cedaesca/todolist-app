@@ -82,8 +82,22 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function destroy(User $user)
+    public function destroy(Request $request)
     {
-        //
+        $this->validate($request, [
+            'confirmation' => 'required'
+        ]);
+
+        $user = $request->user();
+
+        if ($request->confirmation !== $user->email) {
+            return response()->json([
+                'message' => 'Confirmation must be the user\'s email address'
+            ], 422);
+        }
+
+        $user->delete();
+
+        return response()->json($user);
     }
 }
