@@ -2,6 +2,7 @@
 
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithExceptionHandling;
+use Illuminate\Support\Facades\Hash;
 
 class UsersTest extends TestCase
 {
@@ -146,5 +147,38 @@ class UsersTest extends TestCase
 
         $response->assertResponseStatus(200);
         $response->seeJsonEquals($user->toArray());
+    }
+
+    /** @test */
+    public function user_can_update_his_information()
+    {
+        factory(\App\User::class, 20)->create();
+        $user = factory(\App\User::class)->create();
+
+        $newData = [
+            'name' => 'CompletelyUniqueName',
+            'password' => 'newPassword'
+        ];
+
+        $response = $this->actingAs($user)->put('/users', $newData);
+
+        $user->name = $newData['name'];
+
+        // We verify the response gives the updated data
+        $response->seeJsonEquals($user->toArray());
+
+        // Now we assert the data was updated in the database
+        $whereConstraints = [
+            'email' => $user->email,
+            'name' => $user->name
+        ];
+
+        $this->assertTrue(\App\User::where($whereConstraints)->exists());
+
+        // We verify if the password was correctly updated and hashed
+        $user->fresh();
+        $user->makeVisible('password');
+
+        $this->assertTrue(Hash::check($newData['password'], $user->password));
     }
 }
