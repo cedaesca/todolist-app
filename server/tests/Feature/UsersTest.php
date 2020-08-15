@@ -124,4 +124,27 @@ class UsersTest extends TestCase
 
         $this->post('/auth/login', $credentials)->assertResponseStatus(401);
     }
+
+    /** @test */
+    public function guests_cannot_access_users_routes_aside_from_store()
+    {
+        $this->get('/users/me')->assertResponseStatus(401);
+        $this->put('/users')->assertResponseStatus(401);
+        $this->delete('/users')->assertResponseStatus(401);
+    }
+
+    /** @test */
+    public function me_route_returns_authenticated_user_details()
+    {
+        factory(\App\User::class, 5)->create();
+
+        $user = factory(\App\User::class)->create();
+
+        factory(\App\User::class, 5)->create();
+
+        $response = $this->actingAs($user)->get('/users/me');
+
+        $response->assertResponseStatus(200);
+        $response->seeJsonEquals($user->toArray());
+    }
 }
