@@ -14,5 +14,5 @@
 4) Copy the `.env.example` content into `.env`
 5) Generate the application key with `php artisan key:generate`
 6) Generate the JWT Key with `php artisan jwt:secret`
-7) Update the database information
+7) Update the database information in the `.env` file
 8) Run the migrations with `php artisan migrate`
