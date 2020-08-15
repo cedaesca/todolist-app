@@ -90,4 +90,38 @@ class UsersTest extends TestCase
 
         $this->assertArrayStructure($desiredStructure, $response);
     }
+
+    /** @test */
+    public function existing_user_can_login()
+    {
+        $user = factory(\App\User::class)->create();
+
+        $credentials = [
+            'email' => $user->email,
+            'password' => 'password'
+        ];
+
+        $this->post('/auth/login', $credentials)->assertResponseStatus(200);
+
+        $desiredStructure = [
+            'token',
+            'token_type',
+            'expires_in'
+        ];
+
+        $response = json_decode($this->response->getContent(), true);
+
+        $this->assertArrayStructure($desiredStructure, $response);
+    }
+
+    /** @test */
+    public function unexistent_user_cannot_login()
+    {
+        $credentials = [
+            'email' => 'unexistent@user.com',
+            'password' => 'password'
+        ];
+
+        $this->post('/auth/login', $credentials)->assertResponseStatus(401);
+    }
 }
