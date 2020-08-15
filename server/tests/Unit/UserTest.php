@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Hash;
 use Laravel\Lumen\Testing\DatabaseMigrations;
-use Laravel\Lumen\Testing\DatabaseTransactions;
 use App\User;
 
 class UserTest extends TestCase
