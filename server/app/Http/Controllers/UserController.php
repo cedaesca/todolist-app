@@ -92,7 +92,9 @@ class UserController extends Controller
 
         if ($request->confirmation !== $user->email) {
             return response()->json([
-                'message' => 'Confirmation must be the user\'s email address'
+                'confirmation' => [
+                    'Confirmation must be the user\'s email address'
+                ]
             ], 422);
         }
 
