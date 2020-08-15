@@ -20,8 +20,8 @@ $router->get('/', function () use ($router) {
 $router->group(['prefix' => 'users'], function () use ($router) {
     $router->post('/', 'UserController@store');
     $router->get('/me', 'UserController@show');
-    $router->put('/', 'UserController@update');
-    $router->delete('/', 'UserController@destroy');
+    $router->put('/me', 'UserController@update');
+    $router->delete('/me', 'UserController@destroy');
 });
 
 $router->group(['prefix' => 'auth'], function () use ($router) {

@@ -130,8 +130,8 @@ class UsersTest extends TestCase
     public function guests_cannot_access_users_routes_aside_from_store()
     {
         $this->get('/users/me')->assertResponseStatus(401);
-        $this->put('/users')->assertResponseStatus(401);
-        $this->delete('/users')->assertResponseStatus(401);
+        $this->put('/users/me')->assertResponseStatus(401);
+        $this->delete('/users/me')->assertResponseStatus(401);
     }
 
     /** @test */
@@ -160,7 +160,7 @@ class UsersTest extends TestCase
             'password' => 'newPassword'
         ];
 
-        $response = $this->actingAs($user)->put('/users', $newData);
+        $response = $this->actingAs($user)->put('/users/me', $newData);
 
         $user->name = $newData['name'];
 
@@ -188,7 +188,7 @@ class UsersTest extends TestCase
         factory(\App\User::class, 10)->create();
         $user = factory(\App\User::class)->create();
 
-        $response = $this->actingAs($user)->delete('/users', [
+        $response = $this->actingAs($user)->delete('/users/me', [
             'confirmation' => $user->email
         ]);
 
@@ -203,9 +203,9 @@ class UsersTest extends TestCase
     {
         $user = factory(\App\User::class)->create();
 
-        $this->actingAs($user)->delete('/users')->assertResponseStatus(422);
+        $this->actingAs($user)->delete('/users/me')->assertResponseStatus(422);
 
-        $this->actingAs($user)->delete('/users', [
+        $this->actingAs($user)->delete('/users/me', [
             'confirmation' => 'someRandomStuff'
         ])->assertResponseStatus(422);
     }
