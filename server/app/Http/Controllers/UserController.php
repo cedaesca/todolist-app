@@ -4,10 +4,21 @@ namespace App\Http\Controllers;
 
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    /**
+     * Instantiate a new UserController instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('auth', ['except' => 'store']);
+    }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -39,7 +50,7 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        //
+        return Auth::user();
     }
 
     /**
