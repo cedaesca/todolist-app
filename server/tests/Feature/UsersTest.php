@@ -61,6 +61,17 @@ class UsersTest extends TestCase
     }
 
     /** @test */
+    public function emails_must_be_unique()
+    {
+        $firstUser = factory(\App\User::class)->create();
+
+        $secondUser = $this->getUnpersistedUser();
+        $secondUser['email'] = $firstUser->email;
+
+        $this->post('/users', $secondUser)->assertResponseStatus(422);
+    }
+
+    /** @test */
     public function successful_creation_returns_user_data()
     {
         $user = $this->getUnpersistedUser();
