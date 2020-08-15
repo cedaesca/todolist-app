@@ -17,6 +17,8 @@ class UserTest extends TestCase
 
         $response = $this->post('/users', $user);
 
+        unset($user['password']);
+
         $response->assertResponseStatus(201);
         $this->seeInDatabase('users', $user);
     }
