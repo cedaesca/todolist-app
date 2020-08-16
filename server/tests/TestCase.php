@@ -23,7 +23,7 @@ abstract class TestCase extends BaseTestCase
      * 
      * @return array
      */
-    public function getUnpersistedUser(): array
+    protected function getUnpersistedUser(): array
     {
         $user = factory(\App\User::class)->make(['password' => 'password']);
         $user = $user->makeVisible('password')->toArray();
