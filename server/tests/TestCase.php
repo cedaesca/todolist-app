@@ -32,4 +32,14 @@ abstract class TestCase extends BaseTestCase
 
         return $user;
     }
+
+    /**
+     * Returns a decoded response
+     * 
+     * @return array
+     */
+    protected function getDecodedResponse(): array
+    {
+        return json_decode($this->response->getContent(), true);
+    }
 }
