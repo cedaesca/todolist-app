@@ -64,10 +64,8 @@ class UsersTest extends TestCase
     /** @test */
     public function emails_must_be_unique()
     {
-        $firstUser = factory(\App\User::class)->create();
-
         $secondUser = $this->getUnpersistedUser();
-        $secondUser['email'] = $firstUser->email;
+        $secondUser['email'] = $this->user->email;
 
         $this->post('/users', $secondUser)->assertResponseStatus(422);
     }
@@ -95,10 +93,8 @@ class UsersTest extends TestCase
     /** @test */
     public function existing_user_can_login()
     {
-        $user = factory(\App\User::class)->create();
-
         $credentials = [
-            'email' => $user->email,
+            'email' => $this->user->email,
             'password' => 'password'
         ];
 
@@ -137,75 +133,61 @@ class UsersTest extends TestCase
     /** @test */
     public function me_route_returns_authenticated_user_details()
     {
-        factory(\App\User::class, 5)->create();
-
-        $user = factory(\App\User::class)->create();
-
-        factory(\App\User::class, 5)->create();
-
-        $response = $this->actingAs($user)->get('/users/me');
+        $response = $this->actingAs($this->user)->get('/users/me');
 
         $response->assertResponseStatus(200);
-        $response->seeJsonEquals($user->toArray());
+        $response->seeJsonEquals($this->user->toArray());
     }
 
     /** @test */
     public function user_can_update_his_information()
     {
-        factory(\App\User::class, 20)->create();
-        $user = factory(\App\User::class)->create();
-
         $newData = [
             'name' => 'CompletelyUniqueName',
             'password' => 'newPassword'
         ];
 
-        $response = $this->actingAs($user)->put('/users/me', $newData);
+        $response = $this->actingAs($this->user)->put('/users/me', $newData);
 
-        $user->name = $newData['name'];
+        $this->user->name = $newData['name'];
 
         // We verify the response gives the updated data
-        $response->seeJsonEquals($user->toArray());
+        $response->seeJsonEquals($this->user->toArray());
 
         // Now we assert the data was updated in the database
         $whereConstraints = [
-            'email' => $user->email,
-            'name' => $user->name
+            'email' => $this->user->email,
+            'name' => $this->user->name
         ];
 
         $this->assertTrue(\App\User::where($whereConstraints)->exists());
 
         // We verify if the password was correctly updated and hashed
-        $user->fresh();
-        $user->makeVisible('password');
+        $this->user->fresh();
+        $this->user->makeVisible('password');
 
-        $this->assertTrue(Hash::check($newData['password'], $user->password));
+        $this->assertTrue(Hash::check($newData['password'], $this->user->password));
     }
 
     /** @test */
     public function user_can_delete_his_account()
     {
-        factory(\App\User::class, 10)->create();
-        $user = factory(\App\User::class)->create();
-
-        $response = $this->actingAs($user)->delete('/users/me', [
-            'confirmation' => $user->email
+        $response = $this->actingAs($this->user)->delete('/users/me', [
+            'confirmation' => $this->user->email
         ]);
 
         $response->assertResponseStatus(200);
-        $response->seeJsonEquals($user->toArray());
+        $response->seeJsonEquals($this->user->toArray());
 
-        $this->notSeeInDatabase('users', ['email' => $user->email]);
+        $this->notSeeInDatabase('users', ['email' => $this->user->email]);
     }
 
     /** @test */
     public function user_cannot_delete_his_account_without_valid_confirmation()
     {
-        $user = factory(\App\User::class)->create();
+        $this->actingAs($this->user)->delete('/users/me')->assertResponseStatus(422);
 
-        $this->actingAs($user)->delete('/users/me')->assertResponseStatus(422);
-
-        $this->actingAs($user)->delete('/users/me', [
+        $this->actingAs($this->user)->delete('/users/me', [
             'confirmation' => 'someRandomStuff'
         ])->assertResponseStatus(422);
     }

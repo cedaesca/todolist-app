@@ -8,6 +8,12 @@ abstract class TestCase extends BaseTestCase
     use AssertArrayStructure;
 
     /**
+     * User to be used when authentication is needed
+     * 
+     */
+    protected $user;
+
+    /**
      * Creates the application.
      *
      * @return \Laravel\Lumen\Application
@@ -15,6 +21,20 @@ abstract class TestCase extends BaseTestCase
     public function createApplication()
     {
         return require __DIR__ . '/../bootstrap/app.php';
+    }
+
+    /**
+     * PHP Unit setup method
+     * 
+     * @return void
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        factory(\App\User::class, 5)->create();
+        $this->user = factory(\App\User::class)->create();
+        factory(\App\User::class, 5)->create();
     }
 
     /**

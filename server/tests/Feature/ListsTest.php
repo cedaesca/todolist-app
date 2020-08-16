@@ -22,17 +22,15 @@ class ListsTest extends TestCase
     /** @test */
     public function a_list_must_have_a_valid_name()
     {
-        $user = factory(\App\User::class)->create();
-
         $list = ['not_a_name' => 'Hello!'];
 
-        $this->actingAs($user)->post('/lists', $list)->assertResponseStatus(422);
+        $this->actingAs($this->user)->post('/lists', $list)->assertResponseStatus(422);
         $response = $this->getDecodedResponse();
         $this->assertArrayHasKey('name', $response);
 
         $list = ['name' => 'yo'];
 
-        $this->actingAs($user)->post('/lists', $list)->assertResponseStatus(422);
+        $this->actingAs($this->user)->post('/lists', $list)->assertResponseStatus(422);
         $response = $this->getDecodedResponse();
         $this->assertArrayHasKey('name', $response);
     }
@@ -42,16 +40,14 @@ class ListsTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(\App\User::class)->create();
-
         $list = [
             'name' => 'Home Chores'
         ];
 
-        $this->notSeeInDatabase('tasks_lists', ['name' => $list['name'], 'user_id' => $user->id]);
+        $this->notSeeInDatabase('tasks_lists', ['name' => $list['name'], 'user_id' => $this->user->id]);
 
-        $this->actingAs($user)->post('/lists', $list)->assertResponseStatus(201);
+        $this->actingAs($this->user)->post('/lists', $list)->assertResponseStatus(201);
 
-        $this->seeInDatabase('tasks_lists', ['name' => $list['name'], 'user_id' => $user->id]);
+        $this->seeInDatabase('tasks_lists', ['name' => $list['name'], 'user_id' => $this->user->id]);
     }
 }
