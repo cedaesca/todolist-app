@@ -14,6 +14,13 @@ class TasksList extends Model
     protected $fillable = ['name'];
 
     /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = ['user_id' => 'integer'];
+
+    /**
      * Get the User that owns the list
      */
     public function user()
