@@ -79,7 +79,7 @@ class UsersTest extends TestCase
 
         $this->post('/users', $user);
 
-        $response = json_decode($this->response->getContent(), true);
+        $response = $this->getDecodedResponse();
 
         $desiredStructure = [
             'id',
@@ -110,7 +110,7 @@ class UsersTest extends TestCase
             'expires_in'
         ];
 
-        $response = json_decode($this->response->getContent(), true);
+        $response = $this->getDecodedResponse();
 
         $this->assertArrayStructure($desiredStructure, $response);
     }
