@@ -19,6 +19,15 @@ $router->get('/', function () use ($router) {
 
 /*
 |--------------------------------------------------------------------------
+| Auth routes
+|--------------------------------------------------------------------------
+|
+*/
+
+$router->post('/auth/login', 'AuthController@login');
+
+/*
+|--------------------------------------------------------------------------
 | Users routes
 |--------------------------------------------------------------------------
 |
@@ -29,8 +38,4 @@ $router->group(['prefix' => 'users'], function () use ($router) {
     $router->get('/me', 'UserController@show');
     $router->put('/me', 'UserController@update');
     $router->delete('/me', 'UserController@destroy');
-});
-
-$router->group(['prefix' => 'auth'], function () use ($router) {
-    $router->post('/login', 'AuthController@login');
 });
