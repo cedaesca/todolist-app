@@ -18,4 +18,22 @@ class ListsTest extends TestCase
         $this->put('/lists/1')->assertResponseStatus(401);
         $this->delete('/lists/1')->assertResponseStatus(401);
     }
+
+    /** @test */
+    public function a_user_can_create_a_list()
+    {
+        $this->withoutExceptionHandling();
+
+        $user = factory(\App\User::class)->create();
+
+        $list = [
+            'name' => 'Home Chores'
+        ];
+
+        $this->notSeeInDatabase('tasks_lists', ['name' => $list['name'], 'user_id' => $user->id]);
+
+        $this->actingAs($user)->post('/lists', $list)->assertResponseStatus(201);
+
+        $this->seeInDatabase('tasks_lists', ['name' => $list['name'], 'user_id' => $user->id]);
+    }
 }
