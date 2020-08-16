@@ -17,6 +17,13 @@ $router->get('/', function () use ($router) {
     return $router->app->version();
 });
 
+/*
+|--------------------------------------------------------------------------
+| Users routes
+|--------------------------------------------------------------------------
+|
+*/
+
 $router->group(['prefix' => 'users'], function () use ($router) {
     $router->post('/', 'UserController@store');
     $router->get('/me', 'UserController@show');
