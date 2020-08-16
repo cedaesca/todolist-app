@@ -20,6 +20,20 @@ class ListsTest extends TestCase
     }
 
     /** @test */
+    public function a_list_must_have_a_name()
+    {
+        $user = factory(\App\User::class)->create();
+
+        $list = ['not_a_name' => 'Hello!'];
+
+        $this->actingAs($user)->post('/lists', $list)->assertResponseStatus(422);
+
+        $response = $this->getDecodedResponse();
+
+        $this->assertArrayHasKey('name', $response);
+    }
+
+    /** @test */
     public function a_user_can_create_a_list()
     {
         $this->withoutExceptionHandling();
