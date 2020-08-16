@@ -28,6 +28,21 @@ $router->post('/auth/login', 'AuthController@login');
 
 /*
 |--------------------------------------------------------------------------
+| Lists routes
+|--------------------------------------------------------------------------
+|
+*/
+
+$router->group(['prefix' => 'lists'], function () use ($router) {
+    $router->get('/', 'ListController@index');
+    $router->post('/', 'ListController@store');
+    $router->get('/{list}', 'ListController@show');
+    $router->put('/{list}', 'ListController@update');
+    $router->delete('/{list}', 'ListController@destroy');
+});
+
+/*
+|--------------------------------------------------------------------------
 | Users routes
 |--------------------------------------------------------------------------
 |
