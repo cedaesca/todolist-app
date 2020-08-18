@@ -50,4 +50,16 @@ class ListsTest extends TestCase
 
         $this->seeInDatabase('tasks_lists', ['name' => $list['name'], 'user_id' => $this->user->id]);
     }
+
+    /** @test */
+    public function creation_endpoint_returns_created_list()
+    {
+        $this->actingAs($this->user)
+            ->post('/lists', ['name' => 'Home Cores']);
+
+        $list = $this->user->lists()->first()->toArray();
+        unset($list['deleted_at']);
+
+        $this->seeJsonEquals($list, $this->getDecodedResponse());
+    }
 }
