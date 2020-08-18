@@ -62,4 +62,19 @@ class ListsTest extends TestCase
 
         $this->seeJsonEquals($list, $this->getDecodedResponse());
     }
+
+    /** @test */
+    public function a_list_has_the_right_creator()
+    {
+        $list['name'] = $this->user->email;
+
+        $this->notSeeInDatabase('tasks_lists', ['name' => $list['name']]);
+
+        $this->actingAs($this->user)->post('/lists', $list);
+
+        $this->seeInDatabase('tasks_lists', [
+            'name' => $list['name'],
+            'user_id' => $this->user->id
+        ]);
+    }
 }
