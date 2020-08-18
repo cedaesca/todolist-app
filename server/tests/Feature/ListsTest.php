@@ -79,7 +79,7 @@ class ListsTest extends TestCase
     }
 
     /** @test */
-    public function index_endpoint_returns_all_lists_for_authenticated_user()
+    public function an_authenticated_user_can_request_all_his_lists()
     {
         // We set up the lists for the authenticated user
         factory(\App\TasksList::class, 10)->create(['user_id' => $this->user->id]);
