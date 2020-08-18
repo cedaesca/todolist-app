@@ -77,4 +77,22 @@ class ListsTest extends TestCase
             'user_id' => $this->user->id
         ]);
     }
+
+    /** @test */
+    public function index_endpoint_returns_all_lists_for_authenticated_user()
+    {
+        // We set up the lists for the authenticated user
+        factory(\App\TasksList::class, 10)->create(['user_id' => $this->user->id]);
+
+        // Here we add some random lists to other users
+        factory(\App\TasksList::class, 10)->create(['user_id' => 1]);
+        factory(\App\TasksList::class, 10)->create(['user_id' => 2]);
+
+        $this->actingAs($this->user)->get('/lists');
+
+        $response = $this->getDecodedResponse();
+        $lists = $this->user->lists->toArray();
+
+        $this->seeJsonEquals($lists, $response);
+    }
 }
