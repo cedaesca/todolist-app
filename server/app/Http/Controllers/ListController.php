@@ -52,7 +52,11 @@ class ListController extends Controller
      */
     public function show($list)
     {
-        return response()->json(TasksList::findOrFail($list));
+        $list = TasksList::findOrFail($list);
+
+        $this->authorize('view', $list);
+
+        return response()->json($list);
     }
 
     /**

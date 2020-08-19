@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Policies\TasksListPolicy;
+use App\TasksList;
 use App\User;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -35,5 +37,7 @@ class AuthServiceProvider extends ServiceProvider
                 return User::where('api_token', $request->input('api_token'))->first();
             }
         });
+
+        Gate::policy(TasksList::class, TasksListPolicy::class);
     }
 }
