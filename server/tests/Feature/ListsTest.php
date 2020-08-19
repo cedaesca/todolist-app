@@ -141,4 +141,14 @@ class ListsTest extends TestCase
 
         $this->seeJsonEquals($list->toArray(), $response);
     }
+
+    /** @test */
+    public function an_authenticated_user_cannot_update_other_users_lists()
+    {
+        $list = factory(\App\TasksList::class)->create(['user_id' => 2]);
+
+        $this->actingAs($this->user)
+            ->put("/lists/{$list->id}", ['name' => 'new name'])
+            ->assertResponseStatus(403);
+    }
 }
