@@ -120,4 +120,25 @@ class ListsTest extends TestCase
             ->get("/lists/{$list->id}")
             ->assertResponseStatus(403);
     }
+
+    /** @test */
+    public function an_authenticated_user_can_update_his_lists()
+    {
+        $this->withoutExceptionHandling();
+
+        $list = $this->user->lists()->create(['name' => 'to be updated'])->refresh();
+
+        $newName = 'updated successfully';
+
+        $this->actingAs($this->user)
+            ->put("/lists/{$list->id}", ['name' => $newName])
+            ->assertResponseOk();
+
+        $this->seeInDatabase('tasks_lists', ['id' => 1, 'name' => $newName]);
+
+        $response = $this->getDecodedResponse();
+        $list->name = $newName;
+
+        $this->seeJsonEquals($list->toArray(), $response);
+    }
 }
