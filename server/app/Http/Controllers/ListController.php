@@ -47,12 +47,12 @@ class ListController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\TasksList  $tasksList
+     * @param  int $list
      * @return \Illuminate\Http\Response
      */
-    public function show(TasksList $tasksList)
+    public function show($list)
     {
-        //
+        return response()->json(TasksList::findOrFail($list));
     }
 
     /**
