@@ -2,14 +2,11 @@
 
 namespace App\Policies;
 
-//use Illuminate\Auth\Access\HandlesAuthorization;
 use App\User;
 use App\TasksList;
 
 class TasksListPolicy
 {
-    //use HandlesAuthorization;
-
     /**
      * Determine whether the user can view the taksList.
      *
