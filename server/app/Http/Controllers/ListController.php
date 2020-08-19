@@ -50,7 +50,7 @@ class ListController extends Controller
      * @param  int $list
      * @return \Illuminate\Http\Response
      */
-    public function show($list)
+    public function show(int $list)
     {
         $list = TasksList::findOrFail($list);
 
@@ -62,13 +62,24 @@ class ListController extends Controller
     /**
      * Update the specified resource in storage.
      *
+     * @param  int  $list
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\TasksList  $tasksList
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, TasksList $tasksList)
+    public function update(int $list, Request $request)
     {
-        //
+        $this->validate($request, [
+            'name' => 'required|string|min:3'
+        ]);
+
+        $list = TasksList::findOrFail($list);
+
+        $this->authorize('update', $list);
+
+        $list->name = $request->name ?? $list->name;
+        $list->save();
+
+        return response()->json($list);
     }
 
     /**
