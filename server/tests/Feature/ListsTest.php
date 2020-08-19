@@ -110,4 +110,14 @@ class ListsTest extends TestCase
 
         $this->seeJsonEquals($list->toArray(), $response);
     }
+
+    /** @test */
+    public function an_authenticated_user_cannot_request_other_users_lists()
+    {
+        $list = factory(\App\TasksList::class)->create(['user_id' => 2]);
+
+        $this->actingAs($this->user)
+            ->get("/lists/{$list->id}")
+            ->assertResponseStatus(403);
+    }
 }
