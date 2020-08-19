@@ -95,4 +95,19 @@ class ListsTest extends TestCase
 
         $this->seeJsonEquals($lists, $response);
     }
+
+    /** @test */
+    public function an_authenticated_user_can_request_a_single_list()
+    {
+        $list = $this->user->lists()->create(['name' => 'somerandom']);
+        $list->refresh();
+
+        $this->actingAs($this->user)
+            ->get("/lists/{$list->id}")
+            ->assertResponseStatus(200);
+
+        $response = $this->getDecodedResponse();
+
+        $this->seeJsonEquals($list->toArray(), $response);
+    }
 }
