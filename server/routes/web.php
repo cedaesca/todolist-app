@@ -43,6 +43,21 @@ $router->group(['prefix' => 'lists'], function () use ($router) {
 
 /*
 |--------------------------------------------------------------------------
+| Tasks routes
+|--------------------------------------------------------------------------
+|
+*/
+
+$router->group(['prefix' => 'tasks'], function () use ($router) {
+    $router->get('/', 'TaskController@index');
+    $router->post('/', 'TaskController@store');
+    $router->get('/{task}', 'TaskController@show');
+    $router->put('/{task}', 'TaskController@update');
+    $router->delete('/{task}', 'TaskController@destroy');
+});
+
+/*
+|--------------------------------------------------------------------------
 | Users routes
 |--------------------------------------------------------------------------
 |
