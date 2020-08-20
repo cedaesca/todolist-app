@@ -85,11 +85,17 @@ class ListController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\TasksList  $tasksList
+     * @param  int  $tasksList
      * @return \Illuminate\Http\Response
      */
-    public function destroy(TasksList $tasksList)
+    public function destroy(int $list)
     {
-        //
+        $list = TasksList::findOrFail($list);
+
+        $this->authorize('delete', $list);
+
+        $list->delete();
+
+        return response()->json($list);
     }
 }
