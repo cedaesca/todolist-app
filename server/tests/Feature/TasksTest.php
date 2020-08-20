@@ -9,9 +9,10 @@ class TasksTest extends TestCase
     /** @test */
     public function guests_cannot_hit_tasks_endpoints()
     {
-        $this->get('/tasks')->assertResponseStatus(401);
-        $this->post('/tasks')->assertResponseStatus(401);
-        $this->put('/tasks/1')->assertResponseStatus(401);
-        $this->delete('/tasks/1')->assertResponseStatus(401);
+        $list = factory(\App\TasksList::class)->create(['user_id' => 6]);
+
+        $this->post("/lists/{$list->id}/tasks")->assertResponseStatus(401);
+        $this->put("/lists/{$list->id}/tasks/1")->assertResponseStatus(401);
+        $this->delete("/lists/{$list->id}/tasks/1")->assertResponseStatus(401);
     }
 }
