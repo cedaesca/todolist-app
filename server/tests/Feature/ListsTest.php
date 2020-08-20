@@ -151,4 +151,27 @@ class ListsTest extends TestCase
             ->put("/lists/{$list->id}", ['name' => 'new name'])
             ->assertResponseStatus(403);
     }
+
+    /** @test */
+    public function an_authenticated_user_can_delete_his_lists()
+    {
+        $list = $this->user->lists()->create(['name' => 'some_random_list']);
+
+        $this->seeInDatabase('tasks_lists', ['name' => $list->name]);
+
+        $this->actingAs($this->user)->delete("/lists/{$list->id}")->assertResponseOk();
+
+        $this->notSeeInDatabase('tasks_lists', ['name' => $list->name]);
+
+        $this->seeJsonEquals($list->toArray(), $this->getDecodedResponse());
+    }
+
+    /** @test */
+    public function an_authenticated_user_cannot_delete_other_users_lists()
+    {
+        $secondaryUser = \App\User::find(2);
+        $list = $secondaryUser->lists()->create(['name' => 'some_random_list']);
+
+        $this->actingAs($this->user)->delete("/lists/{$list->id}")->assertResponseStatus(403);
+    }
 }
