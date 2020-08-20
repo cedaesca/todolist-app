@@ -28,4 +28,26 @@ class TasksTest extends TestCase
 
         $this->seeJsonEquals($tasks->toArray(), $this->getDecodedResponse());
     }
+
+    /** @test */
+    public function an_authenticated_user_can_create_tasks_in_his_lists()
+    {
+        $list = factory(\App\TasksList::class)->create(['user_id' => $this->user->id]);
+
+        $taskDescription = 'Create helpful tests';
+
+        $this->actingAs($this->user)
+            ->post("/lists/{$list->id}/tasks", ['description' => $taskDescription])
+            ->assertResponseStatus(201);
+
+        $this->seeInDatabase('tasks', [
+            'list_id' => $list->id,
+            'description' => $taskDescription
+        ]);
+
+        $list = $list->tasks()->first()->toArray();
+        unset($list['completed_at']);
+
+        $this->seeJsonEquals($list, $this->getDecodedResponse());
+    }
 }
