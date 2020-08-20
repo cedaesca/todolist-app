@@ -48,7 +48,7 @@ $router->group(['prefix' => 'lists'], function () use ($router) {
 |
 */
 
-$router->group(['prefix' => 'tasks'], function () use ($router) {
+$router->group(['prefix' => 'lists/{list}/tasks'], function () use ($router) {
     $router->get('/', 'TaskController@index');
     $router->post('/', 'TaskController@store');
     $router->get('/{task}', 'TaskController@show');
