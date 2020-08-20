@@ -150,6 +150,8 @@ class ListsTest extends TestCase
         $this->actingAs($this->user)
             ->put("/lists/{$list->id}", ['name' => 'new name'])
             ->assertResponseStatus(403);
+
+        $this->seeInDatabase('tasks_lists', ['name' => $list->name, 'id' => $list->id]);
     }
 
     /** @test */
@@ -173,5 +175,7 @@ class ListsTest extends TestCase
         $list = $secondaryUser->lists()->create(['name' => 'some_random_list']);
 
         $this->actingAs($this->user)->delete("/lists/{$list->id}")->assertResponseStatus(403);
+
+        $this->seeInDatabase('tasks_lists', ['name' => $list->name, 'id' => $list->id]);
     }
 }
