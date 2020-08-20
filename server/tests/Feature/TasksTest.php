@@ -15,4 +15,17 @@ class TasksTest extends TestCase
         $this->put("/lists/{$list->id}/tasks/1")->assertResponseStatus(401);
         $this->delete("/lists/{$list->id}/tasks/1")->assertResponseStatus(401);
     }
+
+    /** @test */
+    public function an_authenticated_user_can_request_all_tasks_from_his_lists()
+    {
+        $list = factory(\App\TasksList::class)->create(['user_id' => $this->user->id]);
+        $tasks = factory(\App\Task::class, 10)->create(['list_id' => $list->id]);
+
+        $this->actingAs($this->user)
+            ->get("/lists/{$list->id}/tasks")
+            ->assertResponseOk();
+
+        $this->seeJsonEquals($tasks->toArray(), $this->getDecodedResponse());
+    }
 }
