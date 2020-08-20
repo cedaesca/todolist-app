@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Task;
 use App\TasksList;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class TaskController extends Controller
 {
@@ -35,12 +36,21 @@ class TaskController extends Controller
     /**
      * Store a newly created resource in storage.
      *
+     * @param int $list
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(int $list, Request $request)
     {
-        //
+        $this->validate($request, [
+            'description' => 'required|string|min:3'
+        ]);
+
+        $list = $request->user()->lists()->findOrFail($list);
+
+        $task = $list->tasks()->create($request->all());
+
+        return response()->json($task, 201);
     }
 
     /**
