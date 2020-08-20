@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Task;
+use App\TasksList;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
@@ -20,11 +21,14 @@ class TaskController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param int $list
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(int $list, Request $request)
     {
-        //
+        return response()->json(
+            $request->user()->lists()->findOrFail($list)->tasks
+        );
     }
 
     /**

@@ -27,4 +27,12 @@ class TasksList extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    /**
+     * Get the tasks belonging to the list
+     */
+    public function tasks()
+    {
+        return $this->hasMany(Task::class, 'list_id');
+    }
 }
