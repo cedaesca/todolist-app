@@ -21,4 +21,12 @@ class Task extends Model
      * @var array
      */
     protected $casts = ['list_id' => 'integer'];
+
+    /**
+     * Get the list where the task belongs to
+     */
+    public function list()
+    {
+        return $this->belongsTo(TasksList::class);
+    }
 }
