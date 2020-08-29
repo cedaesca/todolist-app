@@ -30,6 +30,19 @@ class TasksTest extends TestCase
     }
 
     /** @test */
+    public function an_authenticated_user_cannot_request_tasks_from_other_users_lists()
+    {
+        $list = factory(\App\TasksList::class)->create(['user_id' => 2]);
+        factory(\App\Task::class, 10)->create(['list_id' => $list->id]);
+
+        $this->actingAs($this->user)
+            ->get("/lists/{$list->id}/tasks")
+            ->assertResponseStatus(403);
+
+        $this->seeJsonDoesntContains($list->tasks->toArray());
+    }
+
+    /** @test */
     public function an_authenticated_user_can_create_tasks_in_his_lists()
     {
         $list = factory(\App\TasksList::class)->create(['user_id' => $this->user->id]);
