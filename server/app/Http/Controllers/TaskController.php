@@ -23,14 +23,15 @@ class TaskController extends Controller
      * Display a listing of the resource.
      *
      * @param int $list
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function index(int $list, Request $request)
+    public function index(int $list)
     {
-        return response()->json(
-            $request->user()->lists()->findOrFail($list)->tasks
-        );
+        $list = TasksList::findOrFail($list);
+
+        $this->authorize('view', $list);
+
+        return response()->json($list->tasks);
     }
 
     /**
@@ -47,6 +48,8 @@ class TaskController extends Controller
         ]);
 
         $list = $request->user()->lists()->findOrFail($list);
+
+        $this->authorize('create-task', $list);
 
         $task = $list->tasks()->create($request->all());
 
