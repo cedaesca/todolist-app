@@ -49,8 +49,6 @@ class TaskController extends Controller
 
         $list = $request->user()->lists()->findOrFail($list);
 
-        $this->authorize('create-task', $list);
-
         $task = $list->tasks()->create($request->all());
 
         return response()->json($task, 201);
