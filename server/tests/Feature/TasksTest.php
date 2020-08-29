@@ -63,4 +63,20 @@ class TasksTest extends TestCase
 
         $this->seeJsonEquals($list, $this->getDecodedResponse());
     }
+
+    /** @test */
+    public function an_authenticated_user_cannot_create_tasks_in_another_user_list()
+    {
+        $randomUser = \App\User::find(1);
+
+        $list = factory(\App\TasksList::class)->create(['user_id' => $randomUser->id]);
+
+        $taskDescription = 'Create helpful tests';
+
+        $this->actingAs($this->user)
+            ->post("/lists/{$list->id}/tasks", ['description' => $taskDescription])
+            ->assertResponseStatus(404);
+
+        $this->notSeeInDatabase('tasks', ['description' => $taskDescription]);
+    }
 }
