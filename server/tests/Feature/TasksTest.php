@@ -79,4 +79,23 @@ class TasksTest extends TestCase
 
         $this->notSeeInDatabase('tasks', ['description' => $taskDescription]);
     }
+
+    /** @test */
+    public function an_authenticated_user_can_request_a_single_task()
+    {
+        $task = factory(\App\Task::class)->create(['list_id' => function () {
+            $list = factory(\App\TasksList::class)->create(['user_id' => $this->user->id]);
+
+            return $list->id;
+        }]);
+
+        $this->actingAs($this->user)
+            ->get("/lists/{$task->list->id}/tasks/{$task->id}")
+            ->assertResponseOk();
+
+        $task = $task->toArray();
+        unset($task['list']);
+
+        $this->seeJsonEquals($task, $this->getDecodedResponse());
+    }
 }
