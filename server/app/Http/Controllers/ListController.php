@@ -24,6 +24,12 @@ class ListController extends Controller
      */
     public function index(Request $request)
     {
+        if ($request->withTasks) {
+            $listsWithTasks = $request->user()->lists()->with('tasks')->get();
+
+            return response()->json($listsWithTasks);
+        }
+
         return response()->json($request->user()->lists);
     }
 

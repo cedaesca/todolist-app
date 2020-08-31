@@ -39,5 +39,6 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         Gate::policy(TasksList::class, TasksListPolicy::class);
+        Gate::policy(Task::class, TaskPolicy::class);
     }
 }

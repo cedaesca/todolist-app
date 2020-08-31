@@ -11,35 +11,46 @@ class TasksTest extends TestCase
     {
         $list = factory(\App\TasksList::class)->create(['user_id' => 6]);
 
-        $this->post("/lists/{$list->id}/tasks")->assertResponseStatus(401);
-        $this->put("/lists/{$list->id}/tasks/1")->assertResponseStatus(401);
-        $this->delete("/lists/{$list->id}/tasks/1")->assertResponseStatus(401);
+        $this->post("/tasks")->assertResponseStatus(401);
+        $this->put("/tasks/1")->assertResponseStatus(401);
+        $this->delete("/tasks/1")->assertResponseStatus(401);
     }
 
     /** @test */
     public function an_authenticated_user_can_request_all_tasks_from_his_lists()
     {
-        $list = factory(\App\TasksList::class)->create(['user_id' => $this->user->id]);
-        $tasks = factory(\App\Task::class, 10)->create(['list_id' => $list->id]);
+        factory(\App\TasksList::class, 5)
+            ->create(['user_id' => $this->user->id])
+            ->each(function ($list) {
+                factory(\App\Task::class, 15)->create(['list_id' => $list->id]);
+            });
+
+        $listsWithTasks = $this->user->lists()->with('tasks')->get()->toArray();
 
         $this->actingAs($this->user)
-            ->get("/lists/{$list->id}/tasks")
+            ->get("/lists?withTasks=1")
             ->assertResponseOk();
 
-        $this->seeJsonEquals($tasks->toArray(), $this->getDecodedResponse());
+        $this->seeJsonEquals($listsWithTasks, $this->getDecodedResponse());
     }
 
     /** @test */
     public function an_authenticated_user_cannot_request_tasks_from_other_users_lists()
     {
-        $list = factory(\App\TasksList::class)->create(['user_id' => 2]);
-        factory(\App\Task::class, 10)->create(['list_id' => $list->id]);
+        factory(\App\TasksList::class, 5)
+            ->create(['user_id' => 2])
+            ->each(function ($list) {
+                factory(\App\Task::class, 15)->create(['list_id' => $list->id]);
+            });
+
+        $randomUser = \App\User::find(2);
+
+        $listsWithTasks = $randomUser->lists()->with('tasks')->get()->toArray();
 
         $this->actingAs($this->user)
-            ->get("/lists/{$list->id}/tasks")
-            ->assertResponseStatus(403);
+            ->get("/lists?withTasks=1");
 
-        $this->seeJsonDoesntContains($list->tasks->toArray());
+        $this->seeJsonDoesntContains($listsWithTasks);
     }
 
     /** @test */
@@ -47,16 +58,16 @@ class TasksTest extends TestCase
     {
         $list = factory(\App\TasksList::class)->create(['user_id' => $this->user->id]);
 
-        $taskDescription = 'Create helpful tests';
+        $taskData = [
+            'list_id' => $list->id,
+            'description' => 'Create helpful tests'
+        ];
 
         $this->actingAs($this->user)
-            ->post("/lists/{$list->id}/tasks", ['description' => $taskDescription])
+            ->post("/tasks", $taskData)
             ->assertResponseStatus(201);
 
-        $this->seeInDatabase('tasks', [
-            'list_id' => $list->id,
-            'description' => $taskDescription
-        ]);
+        $this->seeInDatabase('tasks', $taskData);
 
         $list = $list->tasks()->first()->toArray();
         unset($list['completed_at']);

@@ -42,4 +42,16 @@ class TasksListPolicy
     {
         return $tasksList->user_id === $user->id;
     }
+
+    /**
+     * Determine whether the user can create tasks in the list.
+     *
+     * @param  App\User  $user
+     * @param  App\TaksList  $taksList
+     * @return bool
+     */
+    public function createTask(User $user, TasksList $tasksList)
+    {
+        return $tasksList->user_id === $user->id;
+    }
 }
