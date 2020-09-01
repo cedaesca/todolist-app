@@ -167,4 +167,30 @@ class TasksTest extends TestCase
             'list_id' => $task->list_id
         ]);
     }
+
+    /** @test */
+    public function an_authenticated_user_can_delete_a_task()
+    {
+        $task = factory(\App\Task::class)->create(['list_id' => function () {
+            $list = factory(\App\TasksList::class)->create(['user_id' => $this->user->id]);
+
+            return $list->id;
+        }]);
+
+        $this->seeInDatabase('tasks', [
+            'description' => $task->description,
+            'list_id' => $task->list_id
+        ]);
+
+        $this->actingAs($this->user)
+            ->delete("/tasks/{$task->id}")
+            ->assertResponseOk();
+
+        $this->notSeeInDatabase('tasks', [
+            'description' => $task->description,
+            'list_id' => $task->list_id
+        ]);
+
+        $this->seeJsonEquals($task->toArray(), $this->getDecodedResponse());
+    }
 }
