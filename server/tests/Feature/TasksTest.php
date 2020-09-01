@@ -143,4 +143,28 @@ class TasksTest extends TestCase
             'description' => $taskData['description']
         ]);
     }
+
+    /** @test */
+    public function an_authenticated_user_cannot_update_a_task_from_other_users()
+    {
+        $task = factory(\App\Task::class)->create(['list_id' => function () {
+            $list = factory(\App\TasksList::class)->create(['user_id' => 2]);
+
+            return $list->id;
+        }, 'completed_at' => null]);
+
+        $taskData = [
+            'description' => 'Updated description yay!',
+            'completed' => true
+        ];
+
+        $this->actingAs($this->user)
+            ->put("tasks/{$task->id}", $taskData)
+            ->assertResponseStatus(403);
+
+        $this->seeInDatabase('tasks', [
+            'description' => $task->description,
+            'list_id' => $task->list_id
+        ]);
+    }
 }
