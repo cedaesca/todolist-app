@@ -116,6 +116,9 @@ class TaskController extends Controller
      */
     public function destroy(int $task)
     {
+        // We eager load the list so the policy
+        // can make use of that information
+        // without querying again
         $task = Task::with('list')->findOrFail($task);
 
         $this->authorize('delete', $task);
