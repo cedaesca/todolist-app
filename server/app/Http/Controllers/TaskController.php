@@ -116,6 +116,14 @@ class TaskController extends Controller
      */
     public function destroy(int $task)
     {
-        //
+        $task = Task::with('list')->findOrFail($task);
+
+        $this->authorize('delete', $task);
+
+        $task->makeHidden('list');
+
+        $task->delete();
+
+        return response()->json($task, 200);
     }
 }

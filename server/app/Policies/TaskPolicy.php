@@ -40,6 +40,6 @@ class TaskPolicy
      */
     public function delete(User $user, Task $task)
     {
-        //
+        return $task->list->user_id === $user->id;
     }
 }
