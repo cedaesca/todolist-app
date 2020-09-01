@@ -61,13 +61,13 @@ class TaskController extends Controller
      * @param  int  $task
      * @return \Illuminate\Http\Response
      */
-    public function show(int $list, int $task, Request $request)
+    public function show(int $task)
     {
-        $task = $request->user()
-            ->lists()
-            ->findOrFail($list)
-            ->tasks()
-            ->findOrFail($task);
+        $task = Task::with('list')->findOrFail($task);
+
+        $this->authorize('view', $task);
+
+        $task->makeHidden('list');
 
         return response()->json($task);
     }

@@ -101,12 +101,9 @@ class TasksTest extends TestCase
         }]);
 
         $this->actingAs($this->user)
-            ->get("/lists/{$task->list->id}/tasks/{$task->id}")
+            ->get("tasks/{$task->id}")
             ->assertResponseOk();
 
-        $task = $task->toArray();
-        unset($task['list']);
-
-        $this->seeJsonEquals($task, $this->getDecodedResponse());
+        $this->seeJsonEquals($task->toArray(), $this->getDecodedResponse());
     }
 }
