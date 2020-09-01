@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Task;
 use App\TasksList;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class TaskController extends Controller
 {
@@ -82,9 +83,29 @@ class TaskController extends Controller
      * @param  int  $task
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, int $task)
+    public function update(int $task, Request $request)
     {
-        //
+        $this->validate($request, [
+            'description' => 'string|min:3',
+            'completed' => 'bool'
+        ]);
+
+        // We eager load the list so the policy
+        // can make use of that information
+        // without querying again
+        $task = Task::with('list')->findOrFail($task);
+
+        $this->authorize('update', $task);
+
+        if ($request->completed) {
+            $request->completed_at = Carbon::now()->format('Y-m-d H:m:s');
+        }
+
+        $task->description = $request->description ?? $task->description;
+
+        $task->save();
+
+        return response()->json($task);
     }
 
     /**
