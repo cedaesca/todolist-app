@@ -193,4 +193,23 @@ class TasksTest extends TestCase
 
         $this->seeJsonEquals($task->toArray(), $this->getDecodedResponse());
     }
+
+    /** @test */
+    public function an_authenticated_user_cannot_delete_a_task_from_other_users()
+    {
+        $task = factory(\App\Task::class)->create(['list_id' => function () {
+            $list = factory(\App\TasksList::class)->create(['user_id' => 2]);
+
+            return $list->id;
+        }]);
+
+        $this->actingAs($this->user)
+            ->delete("/tasks/{$task->id}")
+            ->assertResponseStatus(403);
+
+        $this->seeInDatabase('tasks', [
+            'description' => $task->description,
+            'list_id' => $task->list_id
+        ]);
+    }
 }
