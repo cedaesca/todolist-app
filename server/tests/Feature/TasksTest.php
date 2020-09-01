@@ -120,4 +120,27 @@ class TasksTest extends TestCase
             ->get("tasks/{$task->id}")
             ->assertResponseStatus(403);
     }
+
+    /** @test */
+    public function an_authenticated_user_can_update_a_single_task()
+    {
+        $task = factory(\App\Task::class)->create(['list_id' => function () {
+            $list = factory(\App\TasksList::class)->create(['user_id' => $this->user->id]);
+
+            return $list->id;
+        }, 'completed_at' => null]);
+
+        $taskData = [
+            'description' => 'Updated description yay!',
+            'completed' => true
+        ];
+
+        $this->actingAs($this->user)
+            ->put("tasks/{$task->id}", $taskData)
+            ->assertResponseOk();
+
+        $this->seeInDatabase('tasks', [
+            'description' => $taskData['description']
+        ]);
+    }
 }
